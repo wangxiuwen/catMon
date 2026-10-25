@@ -16,6 +16,8 @@ pub struct Config {
     pub float_ball: bool,
     /// 主面板上次的位置与尺寸（物理像素）
     pub win: Option<WinRect>,
+    /// 悬浮球上次位置（物理像素）
+    pub ball: Option<WinRect>,
     /// 上次清理时间与释放量
     pub last_clean: Option<LastClean>,
 }
@@ -44,6 +46,7 @@ impl Default for Config {
             autostart: false,
             float_ball: false,
             win: None,
+            ball: None,
             last_clean: None,
         }
     }
@@ -89,6 +92,7 @@ mod tests {
             autostart: true,
             float_ball: true,
             win: Some(WinRect { x: 1, y: 2, w: 3, h: 4 }),
+            ball: Some(WinRect { x: 5, y: 6, w: 84, h: 84 }),
             last_clean: None,
         };
         save(&dir, &cfg);

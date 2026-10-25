@@ -286,9 +286,12 @@ fn main() {
                         api.prevent_close();
                     }
                 }
-                // 退出/系统关机时也保存窗口位置
+                // 退出/系统关机时也保存窗口与悬浮球位置
                 tauri::RunEvent::ExitRequested { .. } => {
                     tray::save_window_rect(app);
+                    if app.state::<AppState>().ball_visible.load(Ordering::Relaxed) {
+                        tray::save_ball_rect(app);
+                    }
                 }
                 _ => {}
             }

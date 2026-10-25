@@ -136,6 +136,7 @@ pub fn setup(app: &mut App) -> tauri::Result<()> {
     let autostart = cfg.autostart;
     let float_ball = cfg.float_ball;
     let win_rect = cfg.win;
+    let ball_rect = cfg.ball;
     let last_clean = cfg.last_clean;
 
     // 自启开启状态下刷新 Run 键（exe 路径可能变化）
@@ -152,6 +153,7 @@ pub fn setup(app: &mut App) -> tauri::Result<()> {
             autostart,
             float_ball,
             win: win_rect,
+            ball: ball_rect,
             last_clean,
         }),
         chars: std::sync::Mutex::new(chars),
@@ -245,9 +247,23 @@ pub fn setup(app: &mut App) -> tauri::Result<()> {
 
     eprintln!("[catmon] tray ready, character={active_id}, metric={metric}");
 
-    // 悬浮球按配置默认关闭，开启过则随启动恢复
+    // 悬浮球按配置默认关闭，开启过则随启动恢复（位置还原到现有显示器内才生效）
     if float_ball {
         if let Some(w) = app.get_webview_window("ball") {
+            if let Some(r) = cfg.ball {
+                let on_screen = w.available_monitors().map(|ms| {
+                    ms.iter().any(|m| {
+                        let (mx, my) = (m.position().x, m.position().y);
+                        let (mw, mh) = (m.size().width as i32, m.size().height as i32);
+                        r.x + r.w as i32 > mx && r.y + r.h as i32 > my && r.x < mx + mw && r.y < my + mh
+                    })
+                }).unwrap_or(false);
+                if on_screen {
+                    let _ = w.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
+                        r.x, r.y,
+                    )));
+                }
+            }
             let _ = w.show();
         }
         app.state::<AppState>()
@@ -394,8 +410,25 @@ pub fn set_float_ball(app: &AppHandle, on: bool) {
     }
     if let Some(w) = app.get_webview_window("ball") {
         if on {
+            // 恢复上次位置（不在任何现有显示器上则保持居中）
+            let r = st.config.lock().unwrap_or_else(|p| p.into_inner()).ball;
+            if let Some(r) = r {
+                let on_screen = w.available_monitors().map(|ms| {
+                    ms.iter().any(|m| {
+                        let (mx, my) = (m.position().x, m.position().y);
+                        let (mw, mh) = (m.size().width as i32, m.size().height as i32);
+                        r.x + r.w as i32 > mx && r.y + r.h as i32 > my && r.x < mx + mw && r.y < my + mh
+                    })
+                }).unwrap_or(false);
+                if on_screen {
+                    let _ = w.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
+                        r.x, r.y,
+                    )));
+                }
+            }
             let _ = w.show();
         } else {
+            save_ball_rect(app);
             let _ = w.hide();
         }
     }
@@ -406,6 +439,23 @@ pub fn set_float_ball(app: &AppHandle, on: bool) {
     app.state::<MenuHandles>().floatball.set_checked(on).ok();
     let cfg = st.config.lock().unwrap_or_else(|p| p.into_inner()).clone();
     let _ = app.emit("config", &cfg);
+}
+
+/// 记录悬浮球当前位置
+pub fn save_ball_rect(app: &AppHandle) {
+    let Some(w) = app.get_webview_window("ball") else { return };
+    let (Ok(pos), Ok(size)) = (w.outer_position(), w.outer_size()) else {
+        return;
+    };
+    let st = app.state::<AppState>();
+    let mut cfg = st.config.lock().unwrap_or_else(|p| p.into_inner());
+    cfg.ball = Some(config::WinRect {
+        x: pos.x,
+        y: pos.y,
+        w: size.width,
+        h: size.height,
+    });
+    config::save(&st.data_dir, &cfg);
 }
 
 pub fn toggle_window(app: &AppHandle) {
