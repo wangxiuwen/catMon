@@ -3,3 +3,4 @@ Cargo.lock.orig
 ui-preview.png
 *.tmp
 src-tauri/gen/
+preview.png
