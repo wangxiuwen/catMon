@@ -73,8 +73,12 @@ function drawNet() {
   series(g, S.tx, max, '#f59e0b', w, h);
 }
 
-function renderProcs() {
+let procCounter = 0;
+function renderProcs(force) {
   const s = S.snap; if (!s) return;
+  procCounter++;
+  // 进程表每秒 innerHTML 全量重建有布局抖动，非强制时每 3 秒刷一次
+  if (!force && procCounter % 3 !== 1) return;
   const list = S.mode === 'cpu' ? (s.procs_cpu || []) : (s.procs_mem || []);
   $('procBody').innerHTML = list.map(p =>
     `<tr><td>${esc(p.name)}</td><td>${p.pid}</td><td>${(p.cpu || 0).toFixed(1)}%</td><td>${fmtSize(p.mem)}</td></tr>`
@@ -359,8 +363,8 @@ function demo() {
   }, 1000);
 }
 
-$('tabCpu').onclick = () => { S.mode = 'cpu'; $('tabCpu').classList.add('on'); $('tabMem').classList.remove('on'); renderProcs(); };
-$('tabMem').onclick = () => { S.mode = 'mem'; $('tabMem').classList.add('on'); $('tabCpu').classList.remove('on'); renderProcs(); };
+$('tabCpu').onclick = () => { S.mode = 'cpu'; $('tabCpu').classList.add('on'); $('tabMem').classList.remove('on'); renderProcs(true); };
+$('tabMem').onclick = () => { S.mode = 'mem'; $('tabMem').classList.add('on'); $('tabCpu').classList.remove('on'); renderProcs(true); };
 $('navMon').onclick = () => switchView('mon');
 $('navClean').onclick = () => {
   switchView('clean');
