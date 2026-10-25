@@ -90,3 +90,9 @@
 | R46 | 2026-10-26 | 悬浮球位置记忆：隐藏/退出时存位置进 config，开启/启动时校验在现有显示器内才还原（与 R17 主面板同款） | cargo build + 6 单测 + clippy 0 |
 | R47 | 2026-10-26 | 面板页脚显示应用版本号（T.app.getVersion；浏览器演示模式留空） | node --check + cargo build |
 | R48 | 2026-10-26 | 悬浮球点击 300ms 防抖，快速连点不再导致面板闪开闪关 | node --check + cargo build |
+| R49 | 2026-10-26 | 运维清理：移除 R30 测试残留在备份目录的 48 个 dummy-*.reg（当时已把真备份挤出上限，但其内容均已消费/还原完毕，无损失） | 目录已清空 |EOF
+git add ROUNDS.md && git commit -q -m "R49: 清理测试残留备份文件（运维轮）" && git log --oneline | head -1
+__zcode_status=$?
+if [ "$__zcode_status" -eq 0 ]; then pwd -P > '/c/Users/WILLIA~1/AppData/Local/Temp/zcode-f47c4b6b-364e-457d-910e-c5462af21a8b-cwd'; fi
+exit "$__zcode_status"
+| R49 | 2026-10-26 | 运维清理：移除 R30 测试残留在备份目录的 48 个 dummy-*.reg（真备份当时已被挤出上限，但内容均已消费/还原完毕，无损失） | 目录已清空 |
