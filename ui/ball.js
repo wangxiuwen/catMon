@@ -13,9 +13,10 @@ function apply(s) {
   memV.textContent = 'M ' + mem.toFixed(0) + '%';
 }
 
-// 左键点击（未拖动）开/关面板；拖动交给 startDragging
+// 左键点击（未拖动）开/关面板；拖动交给 startDragging；300ms 防抖防连点闪烁
 let down = null;
 let dragging = false;
+let lastToggle = 0;
 const ball = document.getElementById('ball');
 ball.addEventListener('mousedown', e => {
   if (e.button !== 0) return;
@@ -30,7 +31,13 @@ window.addEventListener('mousemove', e => {
   }
 });
 window.addEventListener('mouseup', () => {
-  if (down && !dragging) invoke('toggle_panel').catch(console.error);
+  if (down && !dragging) {
+    const now = Date.now();
+    if (now - lastToggle > 300) {
+      lastToggle = now;
+      invoke('toggle_panel').catch(console.error);
+    }
+  }
   down = null;
   dragging = false;
 });

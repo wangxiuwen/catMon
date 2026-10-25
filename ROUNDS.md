@@ -89,3 +89,4 @@
 | R45 | 2026-10-26 | 代码质量基线：clippy 全 workspace 清零（13 处：Default impl/is_multiple_of/sort_by_key/as_chunks/match guard 折叠/while-let），今后 clippy 0 作为默认状态；功能行为零变化 | cargo clippy --workspace = 0 warning + 6 单测 + --info 6 组 |
 | R46 | 2026-10-26 | 悬浮球位置记忆：隐藏/退出时存位置进 config，开启/启动时校验在现有显示器内才还原（与 R17 主面板同款） | cargo build + 6 单测 + clippy 0 |
 | R47 | 2026-10-26 | 面板页脚显示应用版本号（T.app.getVersion；浏览器演示模式留空） | node --check + cargo build |
+| R48 | 2026-10-26 | 悬浮球点击 300ms 防抖，快速连点不再导致面板闪开闪关 | node --check + cargo build |
