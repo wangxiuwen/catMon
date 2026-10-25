@@ -98,7 +98,7 @@ fn ghost(frame: usize, ink: Rgba) -> Vec<u8> {
     c.rect(9.0, 11.0 + dy, 14.0, 9.5, ink);
     for i in 0..3u32 {
         let x0 = 9.0 + i as f32 * 5.0;
-        let dyp = if (i + frame as u32) % 2 == 0 { 3.2 + spread } else { 1.8 };
+        let dyp = if (i + frame as u32).is_multiple_of(2) { 3.2 + spread } else { 1.8 };
         c.poly(&[(x0, 20.0 + dy), (x0 + 2.5, 20.0 + dyp + dy), (x0 + 5.0, 20.0 + dy)], ink);
     }
     c.clear_disc(13.2, 11.0 + dy, 1.5);

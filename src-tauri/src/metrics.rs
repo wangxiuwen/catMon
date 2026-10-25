@@ -80,10 +80,10 @@ impl Sampler {
         self.sys.refresh_memory();
         self.nets.refresh(true);
         // 进程 CPU 占用需要两次间隔刷新才有意义，每 3 秒刷一次即可
-        if self.tick % 3 == 0 {
+        if self.tick.is_multiple_of(3) {
             self.sys.refresh_processes(ProcessesToUpdate::All, true);
         }
-        if self.tick % 5 == 0 {
+        if self.tick.is_multiple_of(5) {
             self.disks.refresh(true);
             self.comps.refresh(true);
         }
@@ -124,7 +124,7 @@ impl Sampler {
             .collect();
         procs.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
         let procs_cpu: Vec<ProcInfo> = procs.iter().take(10).cloned().collect();
-        procs.sort_by(|a, b| b.mem.cmp(&a.mem));
+        procs.sort_by_key(|p| std::cmp::Reverse(p.mem));
         let procs_mem: Vec<ProcInfo> = procs.iter().take(10).cloned().collect();
 
         let temps: Vec<TempInfo> = self

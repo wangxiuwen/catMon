@@ -217,16 +217,8 @@ fn cpuid_items() -> Vec<(&'static str, String)> {
             let size = ways * parts * line * sets_n;
             match (eax >> 5) & 0x7 {
                 1 => l1 += size, // 数据 + 指令两个子叶
-                2 => {
-                    if l2 == 0 {
-                        l2 = size;
-                    }
-                }
-                3 => {
-                    if l3 == 0 {
-                        l3 = size;
-                    }
-                }
+                2 if l2 == 0 => l2 = size,
+                3 if l3 == 0 => l3 = size,
                 _ => {}
             }
         }

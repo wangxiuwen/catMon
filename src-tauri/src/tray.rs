@@ -488,7 +488,7 @@ fn sampler_loop(app: AppHandle) {
         n += 1;
 
         // 每 5 分钟重检任务栏深浅，墨色变了就重建角色帧
-        if n % 300 == 0 {
+        if n.is_multiple_of(300) {
             let st = app.state::<AppState>();
             let new_ink = tray_ink();
             let changed = *st.ink.lock().unwrap_or_else(|p| p.into_inner()) != new_ink;
@@ -501,7 +501,7 @@ fn sampler_loop(app: AppHandle) {
         }
 
         // 每 30 分钟重采系统配置（驱动/磁盘变化能跟上），后台线程不卡交互
-        if n % 1800 == 0 {
+        if n.is_multiple_of(1800) {
             let h = app.clone();
             std::thread::spawn(move || {
                 let info = crate::system_info::collect();
@@ -514,7 +514,7 @@ fn sampler_loop(app: AppHandle) {
             });
         }
 
-        if n % 5 == 0 {
+        if n.is_multiple_of(5) {
             let label = {
                 let st = app.state::<AppState>();
                 let cfg = st.config.lock().unwrap_or_else(|p| p.into_inner());

@@ -237,8 +237,7 @@ mod imp {
 
     fn expand_env(s: &str) -> String {
         let mut out = s.to_string();
-        loop {
-            let Some(a) = out.find('%') else { break };
+        while let Some(a) = out.find('%') {
             let Some(rel) = out[a + 1..].find('%') else { break };
             let var = out[a + 1..a + 1 + rel].to_uppercase();
             match std::env::var(&var) {
@@ -325,8 +324,10 @@ mod imp {
         }
         let u16s: Vec<u16> = v
             .bytes
-            .chunks_exact(2)
-            .map(|c| u16::from_le_bytes([c[0], c[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|c| u16::from_le_bytes(*c))
             .take_while(|&c| c != 0)
             .collect();
         Some(String::from_utf16_lossy(&u16s))
@@ -820,7 +821,7 @@ mod imp {
         if files.len() <= keep {
             return;
         }
-        files.sort_by(|a, b| b.0.cmp(&a.0));
+        files.sort_by_key(|(t, _)| std::cmp::Reverse(*t));
         for (_, p) in files.iter().skip(keep) {
             let _ = fs::remove_file(p);
         }
@@ -1127,7 +1128,7 @@ mod imp {
         for d in &dirs {
             collect(d, 4, &mut out);
         }
-        out.sort_by(|a, b| b.size.cmp(&a.size));
+        out.sort_by_key(|f| std::cmp::Reverse(f.size));
         out.truncate(40);
         out
     }

@@ -165,3 +165,9 @@ impl Canvas {
         out
     }
 }
+
+impl Default for Canvas {
+    fn default() -> Self {
+        Self::new()
+    }
+}
