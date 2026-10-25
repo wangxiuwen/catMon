@@ -499,6 +499,8 @@ mod imp {
         for n in deletable {
             if k.delete_value(&n).is_ok() {
                 rep.removed_reg_items += 1;
+            } else {
+                rep.errors.push(format!("{tag}: {n} 删除失败"));
             }
         }
     }
