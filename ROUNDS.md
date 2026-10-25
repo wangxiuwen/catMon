@@ -77,7 +77,7 @@
 
 ## 当前阻塞（2026-10-25）
 
-- GitHub 开源发布等待用户完成设备码授权（https://github.com/login/device ，代码 E214-194A，走 7897 代理轮询中）；授权完成后执行：gh repo create wangxiuwen/catmon --public --source=. --push。本轮迭代暂缓一轮。
+- GitHub 开源发布等待用户凭据：设备码流程已两轮过期（用户卡在 GitHub 2FA 安全码），或提供 PAT 存 ~/.ghtoken。凭据就绪后执行：gh repo create wangxiuwen/catmon --public --source=. --push。
 
 ## 2026-10-26 补录与新轮
 
