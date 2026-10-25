@@ -253,7 +253,14 @@ async function doClean() {
   S.checkedIds = ids; // 记住用户的选择，重扫后按此恢复勾选
   const btn = $('btnClean');
   btn.disabled = true; btn.textContent = '清理中…';
-  const rep = T ? await T.core.invoke('clean_execute', { ids }) : { freed_bytes: 3.1e9, removed_files: 3820, removed_reg_items: 26, backups: ['备份 x3'], errors: [] };
+  let rep;
+  try {
+    rep = T ? await T.core.invoke('clean_execute', { ids }) : { freed_bytes: 3.1e9, removed_files: 3820, removed_reg_items: 26, backups: ['备份 x3'], errors: [] };
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '清理所选';
+    $('cleanReport').textContent = '清理执行失败: ' + e;
+    return;
+  }
   btn.disabled = false; btn.textContent = '清理所选';
   await rescan(); loadStartup();
   // 报告写在 rescan 之后，避免被 rescan 的清空逻辑吃掉

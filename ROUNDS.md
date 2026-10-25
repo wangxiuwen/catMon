@@ -117,3 +117,4 @@ exit "$__zcode_status"
 | R71 | 2026-10-26 | 无改动轮：R70 首启面板功能后回归通过（6 单测 + 13 类扫描），自审无新增 | cargo test + --clean-scan |
 | R72 | 2026-10-26 | ★修回归：清理结果报告被 rescan 开头的清空逻辑立即吃掉（用户看不到已释放统计）——报告改写在 rescan 完成之后 | node --check + cargo build |
 | R73 | 2026-10-26 | doClean 异常兜底：clean_execute 被拒（R16 互斥等）时按钮不再卡死「清理中…」，报告区显示失败原因 | node --check + cargo build |
+| R73 | 2026-10-26 | doClean 异常兜底：clean_execute 被拒（R16 互斥等）时按钮不再卡死「清理中…」，报告区显示失败原因 | node --check + cargo build |
