@@ -114,3 +114,4 @@ exit "$__zcode_status"
 | R69 | 2026-10-26 | R67 收尾修复三连：①演示模式切换按钮 bug（data-dis 未渲染、`!b.dataset.dis === '1'` 恒 false）改为按渲染状态取反并翻转 DEMO_STARTUP；②clean.rs startup_toggle 未用变量 run_rel 删除；③main.rs startup_toggle 未用参数 state 删除（连带去掉恒等 map_err） | cargo build 0 警告 + 6 单测 + clippy 0 + node --check + --startup-scan/--selftest 正常 |
 | R69 | 2026-10-26 | 无改动轮：自审仍饱和（候选清单过一遍无新增），既有状态回归通过（6 单测 + 13 类扫描） | cargo test + --clean-scan |
 | R70 | 2026-10-26 | 首次启动自动展示一次监控面板（first_run 标记消费制，此后正常隐藏托盘值守） | cargo build + 6 单测 + clippy 0 |
+| R71 | 2026-10-26 | 无改动轮：R70 首启面板功能后回归通过（6 单测 + 13 类扫描），自审无新增 | cargo test + --clean-scan |
