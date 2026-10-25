@@ -105,3 +105,4 @@ exit "$__zcode_status"
 | R60 | 2026-10-26 | README 补隐私声明（纯本地采集/零上传/无遥测/无第三方 SDK，与代码事实一致） | grep 全仓无网络上传路径 |
 | R61 | 2026-10-26 | 第二轮全量回归（覆盖 R44-R51 改动后）：selftest ✓ / clean-scan 13 ✓ / startup 14 ✓ / info 6 ✓ / bigfiles 12 ✓ / 6 单测 ✓ / clippy 0 ✓（无代码改动） | 全绿 |
 | R62 | 2026-10-26 | README 截图更新：重截 demo 模式面板（含监控/清理双页签导航 + 系统配置区 + 复制按钮），替换 R39 之前的旧图 | chrome headless 截图 + git commit |
+| R63 | 2026-10-26 | 仓库卫生：preview.png（gen_icons 每次重新生成的产物）移出 git 追踪并入 .gitignore，仓库文件 41→40 | git ls-files |
