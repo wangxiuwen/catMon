@@ -107,3 +107,4 @@ exit "$__zcode_status"
 | R62 | 2026-10-26 | README 截图更新：重截 demo 模式面板（含监控/清理双页签导航 + 系统配置区 + 复制按钮），替换 R39 之前的旧图 | chrome headless 截图 + git commit |
 | R63 | 2026-10-26 | 仓库卫生：preview.png（gen_icons 每次重新生成的产物）移出 git 追踪并入 .gitignore，仓库文件 41→40 | git ls-files |
 | R64 | 2026-10-26 | 清理页扫描竞态防护：scanning 标志防导航切换重复触发 rescan；扫描失败兜底提示 | node --check + cargo build |
+| R65 | 2026-10-26 | UI 回归复测（覆盖 R64 导航守卫/rescan 改动）：烟测 9 项全绿 | node tools/cdp-uismoke.mjs |
