@@ -99,3 +99,4 @@ exit "$__zcode_status"
 | R50 | 2026-10-26 | 运维：刷新设备码（5503-F8CB，走代理轮询）、更新过期阻塞说明、ball.html 补 title | gh login 日志 + cargo build |
 | R51 | 2026-10-26 | UI：进程表 innerHTML 全量重建从每秒降为每 3 秒（切 tab 时强制刷），减少布局抖动 | node --check + cargo build |
 | R52 | 2026-10-26 | PDH 时钟启动失败后每分钟重试创建（服务未就绪不再永久回退基准值） | cargo build + 6 单测 + clippy 0 |
+| R53 | 2026-10-26 | 半程回归验证轮（无代码改动）：selftest ✓ / clean-scan 13 类 ✓ / startup-scan 14 项 ✓ / info 6 组 ✓ / bigfiles 12 项 ✓ / 6 单测 ✓ / clippy 0 ✓ | 全绿 |
