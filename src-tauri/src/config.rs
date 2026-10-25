@@ -10,6 +10,8 @@ pub struct Config {
     /// 动画速度跟随的指标：cpu | mem | net
     pub metric: String,
     pub paused: bool,
+    /// 首次启动自动展示一次监控面板（消费后置 false）
+    pub first_run: bool,
     /// 开机自启（Windows: HKCU Run 键）
     pub autostart: bool,
     /// 桌面悬浮球（默认关闭）
@@ -43,6 +45,7 @@ impl Default for Config {
             character: "cat".into(),
             metric: "cpu".into(),
             paused: false,
+            first_run: true,
             autostart: false,
             float_ball: false,
             win: None,
@@ -89,6 +92,7 @@ mod tests {
             character: "rocket".into(),
             metric: "net".into(),
             paused: true,
+            first_run: false,
             autostart: true,
             float_ball: true,
             win: Some(WinRect { x: 1, y: 2, w: 3, h: 4 }),

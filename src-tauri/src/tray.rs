@@ -136,6 +136,7 @@ pub fn setup(app: &mut App) -> tauri::Result<()> {
     let autostart = cfg.autostart;
     let float_ball = cfg.float_ball;
     let win_rect = cfg.win;
+    let first_run = cfg.first_run;
     let ball_rect = cfg.ball;
     let last_clean = cfg.last_clean;
 
@@ -151,6 +152,7 @@ pub fn setup(app: &mut App) -> tauri::Result<()> {
             metric: metric.clone(),
             paused,
             autostart,
+            first_run: false,
             float_ball,
             win: win_rect,
             ball: ball_rect,
@@ -286,6 +288,24 @@ pub fn setup(app: &mut App) -> tauri::Result<()> {
             let _ = w.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
                 r.x, r.y,
             )));
+        }
+    }
+
+    // 首次启动自动展示一次面板，让用户知道猫在托盘里
+    if first_run {
+        if let Some(w) = app.get_webview_window("main") {
+            let _ = w.show();
+            let _ = w.set_focus();
+            app.state::<AppState>()
+                .main_visible
+                .store(true, Ordering::Relaxed);
+            push_latest(&handle);
+        }
+        {
+            let st = app.state::<AppState>();
+            let mut c = st.config.lock().unwrap_or_else(|p| p.into_inner());
+            c.first_run = false;
+            config::save(&st.data_dir, &c);
         }
     }
 
