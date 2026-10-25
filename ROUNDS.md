@@ -61,7 +61,7 @@
 - [x] ~~大文件扫描跳过符号链接与重解析点，防循环~~（R11）
 - [x] ~~metrics 事件在窗口重新显示时立即补发一帧~~（R12 push_latest 已覆盖）
 - [x] ~~value_to_reg 各注册表类型转义单测（引号/反斜杠/非 ASCII）~~（R15）
-- [ ] 托盘tooltip 加入角色名
+- [x] ~~托盘tooltip 加入角色名~~（R14，此前漏划）
 - [x] ~~浏览器缓存扫描按 profile 拆分显示（哪些浏览器有多少）~~（R19，按浏览器整体拆分）
 - [x] ~~清理所选后保留各类勾选状态（rescan 后恢复）~~（R21）
 - [x] ~~panel sysinfo 区加"复制全部"按钮~~（R20）
@@ -111,3 +111,4 @@ exit "$__zcode_status"
 | R66 | 2026-10-26 | 注册表值删除失败上报 errors（不再静默跳过），用户可在报告区看到失败原因 | cargo build + 6 单测 + clippy 0 |
 | R67 | 2026-10-26 | 启动项禁用/恢复切换功能（StartupApproved 首字节奇偶位翻转，可逆无删改；HKCU Run/启动文件夹支持，HKLM 需管理员不动）+ UI 禁用/启用按钮；端到端验证 SA 值 03/02 翻转、UI 列表已禁用标注、测试残留全清 | 注册表读写实测 + 6 单测 |
 | R68 | 2026-10-26 | 自审无新增可修项（功能/健壮性/性能/文档四类均已覆盖），全部已绿，无改动 | 6 单测 + --clean-scan 13 类 + 应用运行中 |
+| R69 | 2026-10-26 | R67 收尾修复三连：①演示模式切换按钮 bug（data-dis 未渲染、`!b.dataset.dis === '1'` 恒 false）改为按渲染状态取反并翻转 DEMO_STARTUP；②clean.rs startup_toggle 未用变量 run_rel 删除；③main.rs startup_toggle 未用参数 state 删除（连带去掉恒等 map_err） | cargo build 0 警告 + 6 单测 + clippy 0 + node --check + --startup-scan/--selftest 正常 |

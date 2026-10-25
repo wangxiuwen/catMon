@@ -112,8 +112,8 @@ fn startup_remove(state: tauri::State<AppState>, id: String) -> clean::CleanRepo
 
 /// 启动项禁用/恢复切换，返回切换后的禁用状态
 #[tauri::command]
-fn startup_toggle(state: tauri::State<AppState>, id: String) -> Result<bool, String> {
-    clean::startup_toggle(&id).map_err(|e| e)
+fn startup_toggle(id: String) -> Result<bool, String> {
+    clean::startup_toggle(&id)
 }
 
 #[tauri::command]

@@ -1008,9 +1008,9 @@ mod imp {
         let hkcu = RegKey::predef(HKEY_CURRENT_USER);
         const APPROVED_RUN: &str = r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run";
         const APPROVED_FOLDER: &str = r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder";
-        let (map_rel, run_rel) = match kind {
-            "hkcu-run" => (APPROVED_RUN, None),
-            "userfolder" => (APPROVED_FOLDER, Some(r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupFolder")),
+        let map_rel = match kind {
+            "hkcu-run" => APPROVED_RUN,
+            "userfolder" => APPROVED_FOLDER,
             _ => return Err("该项不支持切换".into()),
         };
         let sa = hkcu

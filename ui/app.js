@@ -172,16 +172,20 @@ function renderClean(scan) {
   $('cleanReg').innerHTML = regs.map(catRow).join('') || '<span class="detail">没有发现</span>';
 }
 
+// 浏览器演示模式的启动项（模块级，切换 disabled 后重渲染才能看到状态翻转）
+const DEMO_STARTUP = [
+  { id: 'hkcu-run:DEMO', source: '注册表 HKCU\\Run', name: 'DemoStartup', cmd: '"C:\\demo\\start.exe" /min', admin: false, disabled: false },
+  { id: 'hkcu-run:DEMO2', source: '注册表 HKCU\\Run', name: 'DemoPaused', cmd: '"C:\\demo\\off.exe" /quiet', admin: false, disabled: true },
+  { id: 'hklm-run:DEMO3', source: '注册表 HKLM\\Run', name: 'DemoSys', cmd: 'C:\\demo\\sys.exe', admin: true },
+];
+
 async function loadStartup() {
   $('startupBody').innerHTML = '<tr><td colspan="3" class="detail">扫描中…</td></tr>';
-  const list = T ? await T.core.invoke('startup_scan') : [
-    { id: 'hkcu-run:DEMO', source: '注册表 HKCU\\Run', name: 'DemoStartup', cmd: '"C:\\demo\\start.exe" /min', admin: false },
-    { id: 'hklm-run:DEMO2', source: '注册表 HKLM\\Run', name: 'DemoSys', cmd: 'C:\\demo\\sys.exe', admin: true },
-  ];
+  const list = T ? await T.core.invoke('startup_scan') : DEMO_STARTUP;
   $('startupBody').innerHTML = list.length ? list.map(s => `
     <tr><td>${esc(s.name)}${s.disabled ? ' <span class="detail">（已禁用）</span>' : ''}<div class="detail">${esc(s.source)}</div></td>
     <td class="detail" style="max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.cmd)}</td>
-    <td style="white-space:nowrap">${s.admin ? '<span class="detail">需管理员</span>' : `<button class="rowbtn" data-toggle="${esc(s.id)}">${s.disabled ? '启用' : '禁用'}</button> <button class="rowbtn" data-del="${esc(s.id)}">删除</button>`}</td></tr>`).join('')
+    <td style="white-space:nowrap">${s.admin ? '<span class="detail">需管理员</span>' : `<button class="rowbtn" data-toggle="${esc(s.id)}" data-dis="${s.disabled ? 1 : 0}">${s.disabled ? '启用' : '禁用'}</button> <button class="rowbtn" data-del="${esc(s.id)}">删除</button>`}</td></tr>`).join('')
     : '<tr><td colspan="3" class="detail">没有启动项</td></tr>';
   $('startupBody').querySelectorAll('button[data-del]').forEach(b => b.onclick = async () => {
     b.disabled = true; b.textContent = '…';
@@ -192,7 +196,14 @@ async function loadStartup() {
   $('startupBody').querySelectorAll('button[data-toggle]').forEach(b => b.onclick = async () => {
     b.disabled = true;
     try {
-      const nowDisabled = T ? await T.core.invoke('startup_toggle', { id: b.dataset.toggle }) : !b.dataset.dis === '1';
+      // 演示模式按渲染时的状态取反（真实模式以后端返回为准）
+      const nowDisabled = T
+        ? await T.core.invoke('startup_toggle', { id: b.dataset.toggle })
+        : b.dataset.dis !== '1';
+      if (!T) {
+        const item = DEMO_STARTUP.find(s => s.id === b.dataset.toggle);
+        if (item) item.disabled = nowDisabled;
+      }
       $('cleanReport').textContent = nowDisabled ? '已禁用该启动项' : '已启用该启动项';
     } catch (e) {
       $('cleanReport').textContent = '切换失败: ' + e;
