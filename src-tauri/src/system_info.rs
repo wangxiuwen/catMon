@@ -306,8 +306,12 @@ fn clean_gpus(v: String) -> String {
 /// PowerShell 一次性查询（Win11 24H2 已移除 wmic，只能走 CIM）
 #[cfg(windows)]
 fn ps_query(script: &str) -> Option<String> {
+    use std::io::Read;
     use std::os::windows::process::CommandExt;
-    let out = std::process::Command::new("powershell")
+    use std::process::{Command, Stdio};
+    use std::time::{Duration, Instant};
+
+    let mut child = Command::new("powershell")
         .args([
             "-NoProfile",
             "-NonInteractive",
@@ -316,11 +320,36 @@ fn ps_query(script: &str) -> Option<String> {
             "-Command",
             script,
         ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
         .creation_flags(0x0800_0000) // CREATE_NO_WINDOW，避免闪黑框
-        .output()
+        .spawn()
         .ok()?;
-    let s = String::from_utf8_lossy(&out.stdout).to_string();
-    (!s.trim().is_empty()).then_some(s)
+
+    // 20 秒硬超时：PS 卡死时宁可丢这次采集，也不让线程悬挂堆积
+    let deadline = Instant::now() + Duration::from_secs(20);
+    let finished = loop {
+        match child.try_wait() {
+            Ok(Some(st)) => break Some(st),
+            Ok(None) if Instant::now() > deadline => {
+                let _ = child.kill();
+                break None;
+            }
+            Ok(None) => std::thread::sleep(Duration::from_millis(50)),
+            Err(_) => {
+                let _ = child.kill();
+                break None;
+            }
+        }
+    };
+    let mut out = String::new();
+    if let Some(mut so) = child.stdout.take() {
+        let _ = so.read_to_string(&mut out);
+    }
+    let _ = child.wait();
+
+    finished?;
+    (!out.trim().is_empty()).then_some(out)
 }
 
 #[cfg(windows)]

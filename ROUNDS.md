@@ -85,3 +85,4 @@
 |---|---|---|---|
 | R42 | 2026-10-26 | flush_dns 命令改 async（ipconfig 进程拉起在主线程有 100-300ms 冻结，R27 同类） | cargo build + 6 单测 |
 | R43 | 2026-10-26 | 健壮性：main.rs 命令处理器 5 处 Mutex lock().unwrap() 补中毒自愈（R26 只覆盖了 tray.rs） | cargo build + 6 单测 |
+| R44 | 2026-10-26 | 防悬挂：系统配置的 PowerShell CIM 采集加 20 秒硬超时（spawn+try_wait 轮询+kill），PS 卡死不再让 sysinfo 线程永久挂起、30 分钟刷新不再堆线程 | cargo build + 6 单测 + --info 6 组正常 |
