@@ -191,21 +191,23 @@ async function loadStartup() {
   });
 }
 
+let scanning = false;
 async function rescan() {
+  if (scanning) return; // 扫描中（导航切换会误触发）直接忽略
+  scanning = true;
   $('btnRescan').disabled = true;
   $('cleanFiles').innerHTML = '<span class="detail">扫描中…</span>';
   $('cleanReg').innerHTML = '';
   $('cleanReport').textContent = '';
-  if (T) {
-    try {
+  try {
+    if (T) {
       const c = await T.core.invoke('get_config');
       const lc = c.last_clean;
       $('lastClean').textContent = lc
         ? `上次清理 ${new Date(lc.ts * 1000).toLocaleString()} · 释放 ${fmtB(lc.freed)}`
         : '尚未清理过';
-    } catch (e) { /* 忽略 */ }
-  }
-  const scan = T ? await T.core.invoke('clean_scan') : {
+    }
+    const scan = T ? await T.core.invoke('clean_scan') : {
     categories: [
       { id: 'temp', group: 'file', title: '用户临时文件', detail: 'Temp（超过 24 小时）', count: 3841, bytes: 2.4e9 },
       { id: 'browser', group: 'file', title: '浏览器缓存', detail: 'Chrome / Edge / Firefox', count: 8123, bytes: 3.1e9 },
@@ -217,6 +219,10 @@ async function rescan() {
     ],
   };
   renderClean(scan);
+  } catch (e) {
+    console.error(e);
+    $('cleanFiles').innerHTML = '<span class="detail">扫描失败，请重试</span>';
+  }
   $('btnRescan').disabled = false;
 }
 
