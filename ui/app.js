@@ -181,12 +181,22 @@ async function loadStartup() {
   $('startupBody').innerHTML = list.length ? list.map(s => `
     <tr><td>${esc(s.name)}${s.disabled ? ' <span class="detail">（已禁用）</span>' : ''}<div class="detail">${esc(s.source)}</div></td>
     <td class="detail" style="max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.cmd)}</td>
-    <td>${s.admin ? '<span class="detail">需管理员</span>' : `<button class="rowbtn" data-id="${esc(s.id)}">删除</button>`}</td></tr>`).join('')
+    <td style="white-space:nowrap">${s.admin ? '<span class="detail">需管理员</span>' : `<button class="rowbtn" data-toggle="${esc(s.id)}">${s.disabled ? '启用' : '禁用'}</button> <button class="rowbtn" data-del="${esc(s.id)}">删除</button>`}</td></tr>`).join('')
     : '<tr><td colspan="3" class="detail">没有启动项</td></tr>';
-  $('startupBody').querySelectorAll('button.rowbtn').forEach(b => b.onclick = async () => {
+  $('startupBody').querySelectorAll('button[data-del]').forEach(b => b.onclick = async () => {
     b.disabled = true; b.textContent = '…';
-    const rep = T ? await T.core.invoke('startup_remove', { id: b.dataset.id }) : { removed_files: 1, backups: ['备份 x1'] };
+    const rep = T ? await T.core.invoke('startup_remove', { id: b.dataset.del }) : { removed_files: 1, backups: ['备份 x1'] };
     $('cleanReport').textContent = `已删除启动项（备份 ${rep.backups.length} 份）` + (rep.errors.length ? ' · ' + rep.errors.join(';') : '');
+    loadStartup();
+  });
+  $('startupBody').querySelectorAll('button[data-toggle]').forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    try {
+      const nowDisabled = T ? await T.core.invoke('startup_toggle', { id: b.dataset.toggle }) : !b.dataset.dis === '1';
+      $('cleanReport').textContent = nowDisabled ? '已禁用该启动项' : '已启用该启动项';
+    } catch (e) {
+      $('cleanReport').textContent = '切换失败: ' + e;
+    }
     loadStartup();
   });
 }

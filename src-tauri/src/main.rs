@@ -110,6 +110,12 @@ fn startup_remove(state: tauri::State<AppState>, id: String) -> clean::CleanRepo
     clean::startup_remove(&id, &state.data_dir.join("clean-backups"))
 }
 
+/// 启动项禁用/恢复切换，返回切换后的禁用状态
+#[tauri::command]
+fn startup_toggle(state: tauri::State<AppState>, id: String) -> Result<bool, String> {
+    clean::startup_toggle(&id).map_err(|e| e)
+}
+
 #[tauri::command]
 async fn large_files_scan() -> Vec<clean::BigFile> {
     clean::large_files_scan()
@@ -239,6 +245,20 @@ fn main() {
         println!("{}", serde_json::to_string_pretty(&clean::startup_scan()).unwrap());
         return;
     }
+    if let Some(pos) = std::env::args().position(|a| a == "--startup-toggle") {
+        let Some(id) = std::env::args().nth(pos + 1) else {
+            eprintln!("用法: --startup-toggle <id>");
+            std::process::exit(1);
+        };
+        match clean::startup_toggle(&id) {
+            Ok(now_disabled) => println!("OK now_disabled={now_disabled}"),
+            Err(e) => {
+                eprintln!("ERR: {e}");
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
     if std::env::args().any(|a| a == "--bigfiles") {
         println!("{}", serde_json::to_string_pretty(&clean::large_files_scan()).unwrap());
         return;
@@ -260,6 +280,7 @@ fn main() {
             clean_execute,
             startup_scan,
             startup_remove,
+            startup_toggle,
             large_files_scan,
             flush_dns,
             toggle_panel,

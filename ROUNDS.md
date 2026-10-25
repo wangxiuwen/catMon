@@ -109,3 +109,4 @@ exit "$__zcode_status"
 | R64 | 2026-10-26 | 清理页扫描竞态防护：scanning 标志防导航切换重复触发 rescan；扫描失败兜底提示 | node --check + cargo build |
 | R65 | 2026-10-26 | UI 回归复测（覆盖 R64 导航守卫/rescan 改动）：烟测 9 项全绿 | node tools/cdp-uismoke.mjs |
 | R66 | 2026-10-26 | 注册表值删除失败上报 errors（不再静默跳过），用户可在报告区看到失败原因 | cargo build + 6 单测 + clippy 0 |
+| R67 | 2026-10-26 | 启动项禁用/恢复切换功能（StartupApproved 首字节奇偶位翻转，可逆无删改；HKCU Run/启动文件夹支持，HKLM 需管理员不动）+ UI 禁用/启用按钮；端到端验证 SA 值 03/02 翻转、UI 列表已禁用标注、测试残留全清 | 注册表读写实测 + 6 单测 |

@@ -1001,6 +1001,48 @@ mod imp {
         out
     }
 
+    /// 启动项禁用/恢复切换（改 StartupApproved 首字节标志，可逆、无删改）
+    /// 支持 hkcu-run 与 userfolder；HKLM/全体用户需管理员不支持
+    pub fn startup_toggle(id: &str) -> Result<bool, String> {
+        let (kind, name) = id.split_once(':').ok_or_else(|| format!("无效 id: {id}"))?;
+        let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+        const APPROVED_RUN: &str = r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run";
+        const APPROVED_FOLDER: &str = r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder";
+        let (map_rel, run_rel) = match kind {
+            "hkcu-run" => (APPROVED_RUN, None),
+            "userfolder" => (APPROVED_FOLDER, Some(r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupFolder")),
+            _ => return Err("该项不支持切换".into()),
+        };
+        let sa = hkcu
+            .open_subkey_with_flags(map_rel, KEY_QUERY_VALUE | KEY_SET_VALUE)
+            .map_err(|e| format!("无法打开 StartupApproved: {e}"))?;
+        // 无记录视为启用；有记录翻首字节最低位
+        let mut v = match sa.get_raw_value(name) {
+            Ok(v) => v,
+            Err(_) => RegValue {
+                bytes: {
+                    let mut b = vec![0x02u8];
+                    b.resize(12, 0);
+                    b[0] = 0x02;
+                    b
+                },
+                vtype: winreg::enums::RegType::REG_BINARY,
+            },
+        };
+        if v.bytes.len() < 12 {
+            v.bytes.resize(12, 0);
+        }
+        let now_disabled = v.bytes[0] & 0x01 == 0x01;
+        if now_disabled {
+            v.bytes[0] &= 0xFE;
+        } else {
+            v.bytes[0] |= 0x01;
+        }
+        sa.set_raw_value(name, &v)
+            .map_err(|e| format!("写入失败: {e}"))?;
+        Ok(!now_disabled)
+    }
+
     pub fn startup_remove(id: &str, backup_dir: &Path) -> CleanReport {
         let mut rep = CleanReport::default();
         let Some((kind, name)) = id.split_once(':') else {
@@ -1208,7 +1250,7 @@ mod imp {
 
 #[cfg(windows)]
 pub use imp::{
-    execute, flush_dns, large_files_scan, scan, startup_remove, startup_scan,
+    execute, flush_dns, large_files_scan, scan, startup_remove, startup_scan, startup_toggle,
 };
 
 #[cfg(not(windows))]
@@ -1287,6 +1329,11 @@ pub fn startup_scan() -> Vec<StartupItem> {
 #[cfg(not(windows))]
 pub fn startup_remove(_id: &str, _backup_dir: &std::path::Path) -> CleanReport {
     CleanReport::default()
+}
+
+#[cfg(not(windows))]
+pub fn startup_toggle(_id: &str) -> Result<bool, String> {
+    Err("仅 Windows 支持".into())
 }
 
 #[cfg(not(windows))]
