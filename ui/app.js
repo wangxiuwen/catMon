@@ -254,12 +254,13 @@ async function doClean() {
   const btn = $('btnClean');
   btn.disabled = true; btn.textContent = '清理中…';
   const rep = T ? await T.core.invoke('clean_execute', { ids }) : { freed_bytes: 3.1e9, removed_files: 3820, removed_reg_items: 26, backups: ['备份 x3'], errors: [] };
+  btn.disabled = false; btn.textContent = '清理所选';
+  await rescan(); loadStartup();
+  // 报告写在 rescan 之后，避免被 rescan 的清空逻辑吃掉
   $('cleanReport').textContent =
     `已释放 ${fmtB(rep.freed_bytes)} · 删除文件 ${rep.removed_files} 个 · 注册表清理 ${rep.removed_reg_items} 项` +
     (rep.backups && rep.backups.length ? ` · 注册表备份 ${rep.backups.length} 份（.reg，双击可还原）` : '') +
     (rep.errors && rep.errors.length ? ` · 失败：${rep.errors.length} 条` : '');
-  btn.disabled = false; btn.textContent = '清理所选';
-  rescan(); loadStartup();
 }
 
 async function scanBig() {
