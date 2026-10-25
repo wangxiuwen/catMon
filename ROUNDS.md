@@ -1,0 +1,80 @@
+# CatMon 自我迭代日志
+
+> 规则：每轮只做一件小而明确的事，改完必须 `cargo build --release -p catmon` 通过并做对应验证，再在此登记。
+
+## 已完成
+
+| 轮次 | 日期 | 内容 | 验证 |
+|---|---|---|---|
+| R1 | 2026-10-25 | recentlnk 分类归组修正（reg→file，最近文档是文件不是注册表） | --clean-scan group 字段 |
+| R2 | 2026-10-25 | 卸载残留/MuiCache 判据跳过 UNC 网络路径（\\ 开头不探测，防卡顿防误报） | 单测 exe_from_cmd_cases |
+| R3 | 2026-10-25 | expand_env 值含 % 时终止展开，防死循环 | 单测 expand_env_basic |
+| R4 | 2026-10-25 | 判据单测补齐（真实文件/PATH 裸命令/UNC/不存在路径四类） | cargo test 4 passed |
+| R5 | 2026-10-25 | 开机自启托盘开关（HKCU Run 键 + config.autostart 持久化 + 写失败回滚 + 启动时刷新 exe 路径） | 构建通过 |
+| R6 | 2026-10-25 | config 变更事件：托盘切角色/指标/暂停/自启后，面板页眉提示实时刷新（含自启状态） | 构建通过 |
+| R7 | 2026-10-25 | 托盘墨色随任务栏深浅每 5 分钟重检，变化即重建角色帧（ink 改 Mutex<Rgba>，Rgba 加 PartialEq） | 构建通过 |
+| R8 | 2026-10-25 | 面板隐藏时停发 metrics 事件（省 IPC；重开后 1 秒内自动追上） | 构建通过 |
+| R9 | 2026-10-25 | 清理页明示 .reg 备份目录路径 | 目检 |
+| R10 | 2026-10-25 | 编译期修复：主题重检块作用域、digits ink Mutex 借用 | cargo build |
+| R11 | 2026-10-25 | 大文件扫描跳过 junction/symlink 重解析点（REPARSE 属性），防 XP 兼容链循环空扫 | --bigfiles 返回 12 项正常 |
+| R12 | 2026-10-25 | ★修复「监控没数据」真因：项目缺 Tauri v2 capabilities 声明，event.listen 被 ACL 拒绝（自定义命令默认放行所以此前构建/自检全绿）——补 src-tauri/capabilities/default.json（main+ball, core:default）；事件推送可见性改原子标志（后台线程查 is_visible 不可靠）；显示面板/悬浮球时立即补发最新一帧；前端先挂监听再取快照 | tools/cdp-verify.mjs 实测 VERDICT: EVENTS FLOWING（cpu 7.49→5.23 实时变化） |
+| R13 | 2026-10-25 | 桌面悬浮球（默认关闭，托盘菜单勾选开启）：84px 透明圆环 CPU% + 内存小字，拖动移动、左键开关面板、右键隐藏；配置持久化，随启动恢复 | CDP 探针：ball 页 listen OK / snapshot cpu=8.4 / DOM 已渲染 5% |
+| R14 | 2026-10-25 | 托盘 tooltip 加入角色名（CatMon · 猫 · CPU …），切角色即跟随 | cargo build + 4 单测通过 |
+| R15 | 2026-10-25 | value_to_reg 转义单测：默认名 @、反斜杠/引号转义、DWORD/QWORD/BINARY/EXPAND/MULTI/未知类型兜底（.reg 备份安全网钉死） | cargo test 5 passed |
+| R16 | 2026-10-25 | clean_execute 幂等保护：AtomicBool compare_exchange 互斥 + Drop 守卫兜底，并发触发返回「已有一次清理正在执行」 | cargo build + 5 单测 + --clean-scan 11 类正常 |
+| R17 | 2026-10-25 | 面板窗口尺寸/位置记忆：隐藏/关闭时存 WinRect 进 config，启动恢复；校验恢复位置是否落在现有显示器上（拔显示器不丢窗口，否则保持居中） | cdp-verify 触发 hide 后 config.json 出现 "win"；二次启动 tray ready 正常 |
+| R18 | 2026-10-25 | icon.ico 升级多尺寸（16/32/48/256 PNG 条目，Explorer 大图标不再糊）；修三连 bug：48 非整数倍缩放崩溃（nearest 通吃升降采样）、目录区未 resize 越界、条目偏移漏 ICONDIR 6 字节 | py 结构校验 4 条目全 dataOK；touch build.rs 强制重嵌资源后构建通过 |
+| R19 | 2026-10-25 | 浏览器缓存按浏览器拆分（browser:Chrome / browser:Edge / browser:Brave / browser:Firefox 各自扫描与清理） | --clean-scan：Chrome 8362 项 982MB、Edge 189 项、Firefox 10 项 |
+| R20 | 2026-10-25 | 系统配置区「复制全部」按钮：全文按【组】+ 键值排版进剪贴板（clipboard API + execCommand 兜底） | CDP 实测：点击后 copyMsg=已复制 ✓ |
+| R21 | 2026-10-25 | 清理所选后保留用户勾选状态（checkedIds 记忆，重扫/清理后按记忆恢复；首次仍默认全选） | node --check + 构建 |
+| R22 | 2026-10-25 | 启动项列表显示禁用状态：读 StartupApproved 键（首字节奇数=已禁用），名称后标注「已禁用」 | --startup-scan 实测输出 1 条 disabled:true |
+| R23 | 2026-10-25 | 大文件面板阈值切换（≥100MB / ≥500MB / ≥1GB）：扫一次本地过滤即时生效 | node --check + 构建 |
+| R24 | 2026-10-25 | WebView2 缺失提示：启动前按 MS 注册表口径（HKLM WOW6432Node/HKLM/HKCU 三处 pv）检测运行时，缺失弹原生错误框给下载地址，不再静默失败 | --check-webview2 本机输出 missing=false（已装，检测路径正确） |
+| R25 | 2026-10-25 | 清理执行进度反馈：execute 加 progress 回调，每类开始发 clean-progress 事件（i/total/id），完成发 done；前端按钮显示「清理中 i/total」 | CDP 实测事件序列 [{i:0},{i:1},{done:true}]、按钮文案复位正常 |
+| R26 | 2026-10-25 | 健壮性：tray.rs 全部 24 处 Mutex lock().unwrap() 改为中毒自愈（unwrap_or_else into_inner），杜绝一次持锁 panic 连环打死采样/动画线程导致监控永久无数据 | cargo build + 5 单测 + cdp-verify EVENTS FLOWING |
+| R27 | 2026-10-25 | ★性能：clean_scan/clean_execute/startup_scan/large_files_scan 改 async（Tauri v2 同步命令跑主线程，秒级扫描会冻结面板 UI） | CDP 实测扫描期间 UI 响应 worst=1ms（UI RESPONSIVE）、scan categories=13 |
+| R28 | 2026-10-25 | 防循环：walk/clean_walk 跳过 junction/symlink 重解析目录（R18 同款防护补齐到清理遍历器，%TEMP% 出现兼容链不再绕圈） | cargo build + 5 单测 + --clean-scan 13 类正常 |
+| R29 | 2026-10-25 | 曲线时间断档检测：面板隐藏（事件停发）超过 10 秒后重开，清空历史重画，不再把断档画成横跨的假连线 | node --check + 构建 |
+| R30 | 2026-10-25 | 备份目录自动修剪：execute 末尾按修改时间只保留最近 50 份 .reg，防无限增长 | 实测 55 个假备份 → --clean-exec 后恰好剩 50 |
+| R31 | 2026-10-25 | config.json 原子写：先落 .tmp 再 rename 替换，防写到一半断电损坏配置（角色/自启/窗口位置全丢）；补存取回环 + 覆盖写单测 | cargo test 6 passed |
+| R32 | 2026-10-25 | 退出/系统关机路径补保存窗口矩形：RunEvent::ExitRequested 时 save_window_rect（此前只有隐藏和 X 路径保存，托盘退出会丢最新位置） | cargo build + 运行正常（config 已有 win 字段） |
+| R33 | 2026-10-25 | 单实例保护：命名互斥体 Local\CatMon.SingleInstance，双击第二个实例弹「已经在运行」提示后退出，杜绝双托盘猫/双采样器/配置互踩；测试旗标（--selftest 等）不受影响 | 实测：A 运行中启动 B → B 停在提示框（16MB，未初始化托盘），A 完好 |
+| R34 | 2026-10-25 | ★修 R33 回归：ensure_single_instance 被插在旗标处理中间，GUI 运行时 --selftest/--clean-scan 等验证旗标被单实例误拦——调用挪到全部旗标之后、Builder 之前 | 实测 GUI 运行中：--selftest OK、--clean-scan 13 类、--startup-scan 14 项全部正常 |
+| R35 | 2026-10-25 | ★一致性修复：数字角色永远显示 CPU，与「速度跟随内存/网络」自相矛盾——改为显示当前选定指标的百分比，菜单标签改「数字（跟随指标）」 | cargo build + 6 单测 |
+| R36 | 2026-10-25 | 系统配置每 30 分钟后台重采（此前启动后永不刷新，换驱动/插磁盘跟不上），采集在后台线程不卡交互 | cargo build |
+| R37 | 2026-10-25 | 启动项删除补净尾巴：删 Run 值时连带清掉 StartupApproved 里的禁用/启用记录（先随 .reg 一起备份），不留孤儿数据 | cargo build + 6 单测 |
+| R38 | 2026-10-25 | R37 对称补齐：启动文件夹项删除后连带清 StartupApproved\StartupFolder 记录（.reg 先备份） | cargo build + 6 单测 + --startup-scan 14 项正常 |
+| R39 | 2026-10-25 | 清理页显示「上次清理时间 · 释放量」（last_clean 持久化到 config，clean_execute 成功后记录） | node --check + 构建 |
+| R40 | 2026-10-25 | 自定义角色加载防呆：sprites 目录里超过 20MB 的 PNG 直接跳过（解码会放大数倍吃内存，进程不至于被一张图打爆） | cargo build |
+| R41 | 2026-10-25 | ★性能：动画线程心跳（25 次/秒）不再全量克隆整个角色帧表（~100KB+ 分配白耗），锁内只读元数据，真正切帧时才克隆那一帧 4KB | cargo build + cdp-verify EVENTS FLOWING |
+
+## 验证工具
+
+- `tools/cdp-verify.mjs [port]`：主面板事件链路端到端验证（需以 WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9223" 启动后运行）
+- `tools/cdp-debug.mjs` / `tools/cdp-ball.mjs`：页面状态深查 / 悬浮球探针
+
+## 待办池（下轮从这里挑或自行审查发现）
+
+- [x] ~~面板窗口尺寸/位置记忆（退出前保存到 config.json，重开还原）~~（R17，含显示器校验）
+- [x] ~~清理执行进度反馈：大目录清理时向面板发粗粒度进度事件~~（R25）
+- [x] ~~startup_scan 显示 StartupApproved 禁用状态（标记"已禁用"）~~（R22）
+- [x] ~~大文件扫描跳过符号链接与重解析点，防循环~~（R11）
+- [x] ~~metrics 事件在窗口重新显示时立即补发一帧~~（R12 push_latest 已覆盖）
+- [x] ~~value_to_reg 各注册表类型转义单测（引号/反斜杠/非 ASCII）~~（R15）
+- [ ] 托盘tooltip 加入角色名
+- [x] ~~浏览器缓存扫描按 profile 拆分显示（哪些浏览器有多少）~~（R19，按浏览器整体拆分）
+- [x] ~~清理所选后保留各类勾选状态（rescan 后恢复）~~（R21）
+- [x] ~~panel sysinfo 区加"复制全部"按钮~~（R20）
+- [x] ~~bigfiles 增加最小体积切换（100MB/500MB/1GB）~~（R23）
+- [x] ~~判断 WebView2 缺失时给出友好提示~~（R24）
+- [x] ~~icon 在资源管理器中显示大图（多尺寸 ico：16/32/48/256 打包）~~（R18）
+- [x] ~~clean_execute 对重复点击的幂等保护（前端已禁按钮，后端可加锁）~~（R16）
+
+## 已知限制（不列为待办）
+
+- HKLM 系统级清理/启动项需要管理员，明确不处理
+- CPU-Z 的跑分/电压/完整 SPD 时序/制程 TDP 依赖内核驱动与内置数据库，不做
+
+## 当前阻塞（2026-10-25）
+
+- GitHub 开源发布等待用户完成设备码授权（https://github.com/login/device ，代码 E214-194A，走 7897 代理轮询中）；授权完成后执行：gh repo create wangxiuwen/catmon --public --source=. --push。本轮迭代暂缓一轮。

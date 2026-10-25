@@ -1,0 +1,16 @@
+const port = process.argv[2] || '9223';
+const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+const main = targets.find(t => (t.title || '').includes('CatMon'));
+const ws = new WebSocket(main.webSocketDebuggerUrl);
+let id = 0; const pending = new Map();
+const send = (m, p) => new Promise(res => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method: m, params: p })); });
+ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m.result); pending.delete(m.id); } };
+await new Promise(r => ws.onopen = r);
+const ev = async expr => { const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true }); return r.exceptionDetails ? 'EXC: ' + (r.exceptionDetails.exception?.description || '').slice(0, 300) : JSON.stringify(r.result?.value); };
+console.log('setup:', await ev(`(async()=>{ window.__prog=[]; await window.__TAURI__.event.listen('clean-progress', e=>window.__prog.push(e.payload)); await window.__TAURI__.core.invoke('toggle_panel'); return 'ok'; })()`));
+console.log('invoke:', await ev(`(async()=>{ await window.__TAURI__.core.invoke('clean_execute', { ids: ['zzz-a', 'zzz-b'] }); return 'done'; })()`));
+await new Promise(r => setTimeout(r, 800));
+console.log('events:', await ev(`JSON.stringify(window.__prog)`));
+console.log('btn:', await ev(`document.getElementById('btnClean').textContent`));
+await ev(`window.__TAURI__.core.invoke('toggle_panel')`);
+process.exit(0);

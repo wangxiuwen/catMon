@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "主面板与悬浮球的默认能力：核心事件、窗口拖拽、IPC",
+  "windows": ["main", "ball"],
+  "permissions": ["core:default"]
+}

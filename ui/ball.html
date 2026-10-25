@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 84px; height: 84px; background: transparent; overflow: hidden; user-select: none; }
+  #ball { width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  #ring {
+    --p: 0;
+    width: 76px; height: 76px; border-radius: 50%;
+    background: conic-gradient(#53d3ff calc(var(--p) * 1%), rgba(255, 255, 255, .14) 0);
+    display: flex; align-items: center; justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .45));
+  }
+  #hole {
+    width: 58px; height: 58px; border-radius: 50%;
+    background: rgba(11, 15, 21, .9);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: Consolas, monospace; color: #dbe4f0;
+  }
+  #cpuV { font-size: 15px; font-weight: 700; line-height: 1; }
+  #memV { font-size: 9px; color: #8494ab; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div id="ball" title="左键：开/关面板 · 拖动：移动 · 右键：隐藏悬浮球">
+  <div id="ring">
+    <div id="hole">
+      <span id="cpuV">--</span>
+      <span id="memV"></span>
+    </div>
+  </div>
+</div>
+<script src="ball.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+const port = process.argv[2] || '9223';
+const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+const main = targets.find(t => (t.title || '').includes('CatMon'));
+const ws = new WebSocket(main.webSocketDebuggerUrl);
+let id = 0; const pending = new Map();
+const send = (m, p) => new Promise(res => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method: m, params: p })); });
+ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m.result); pending.delete(m.id); } };
+await new Promise(r => ws.onopen = r);
+const ev = async expr => { const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true }); return r.exceptionDetails ? 'EXC: ' + (r.exceptionDetails.exception?.description || r.exceptionDetails.text).slice(0, 400) : JSON.stringify(r.result?.value); };
+console.log('listen probe:', await ev(`(async()=>{try{const un=await window.__TAURI__.event.listen('probe',()=>{});return 'OK '+typeof un;}catch(e){return 'ERR: '+(e&&e.message||e);}})()`));
+console.log('invoke snapshot:', await ev(`(async()=>{try{const s=await window.__TAURI__.core.invoke('get_snapshot');return s?('cpu='+s.cpu+' cores='+s.cores.length):'null';}catch(e){return 'ERR: '+(e&&e.message||e);}})()`));
+console.log('refreshHint probe:', await ev(`(async()=>{try{await refreshHint();return 'OK: '+document.getElementById('metricHint').textContent;}catch(e){return 'ERR: '+(e&&e.message||e);}})()`));
+console.log('apply probe:', await ev(`(async()=>{try{apply({cpu:42,cores:[42],mem_used:1,mem_total:2,rx:0,tx:0,disks:[],procs_cpu:[],procs_mem:[],temps:[],uptime:0});return 'OK '+document.getElementById('cpuV').textContent;}catch(e){return 'ERR: '+(e&&e.stack||e);}})()`));
+process.exit(0);

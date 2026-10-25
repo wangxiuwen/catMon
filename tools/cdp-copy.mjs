@@ -1,0 +1,18 @@
+const port = process.argv[2] || '9223';
+const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+const main = targets.find(t => (t.title || '').includes('CatMon'));
+const ws = new WebSocket(main.webSocketDebuggerUrl);
+let id = 0; const pending = new Map();
+const send = (m, p) => new Promise(res => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method: m, params: p })); });
+ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m.result); pending.delete(m.id); } };
+await new Promise(r => ws.onopen = r);
+const ev = async expr => { const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true }); return r.exceptionDetails ? 'EXC: ' + (r.exceptionDetails.exception?.description || '').slice(0, 200) : JSON.stringify(r.result?.value); };
+await ev(`document.getElementById('navClean')`);
+await ev(`window.__TAURI__.core.invoke('toggle_panel')`);
+await new Promise(r => setTimeout(r, 500));
+console.log('btn exists:', await ev(`!!document.getElementById('btnCopyInfo')`));
+console.log('click:', await ev(`document.getElementById('btnCopyInfo').click(); 'clicked'`));
+await new Promise(r => setTimeout(r, 300));
+console.log('msg:', await ev(`document.getElementById('copyMsg').textContent`));
+await ev(`window.__TAURI__.core.invoke('toggle_panel')`);
+process.exit(0);
