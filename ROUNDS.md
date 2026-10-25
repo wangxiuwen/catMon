@@ -101,3 +101,4 @@ exit "$__zcode_status"
 | R52 | 2026-10-26 | PDH 时钟启动失败后每分钟重试创建（服务未就绪不再永久回退基准值） | cargo build + 6 单测 + clippy 0 |
 | R53 | 2026-10-26 | 半程回归验证轮（无代码改动）：selftest ✓ / clean-scan 13 类 ✓ / startup-scan 14 项 ✓ / info 6 组 ✓ / bigfiles 12 项 ✓ / 6 单测 ✓ / clippy 0 ✓ | 全绿 |
 | R54 | 2026-10-26 | UI 端到端烟测（CDP）：主面板 9 项全绿（开合/页眉/系统配置/复制/清理页/版本号/实时数据）；修正烟测脚本误选悬浮球页的选择器；球页数据链路顺带验证 ✓ | node tools/cdp-uismoke.mjs 全绿 |
+| R59 | 2026-10-26 | 卫生轮：强制重编译验证编译警告清零（0 warning，无代码改动） | cargo build 重编译 |
