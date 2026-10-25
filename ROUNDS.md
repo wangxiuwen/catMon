@@ -112,3 +112,4 @@ exit "$__zcode_status"
 | R67 | 2026-10-26 | 启动项禁用/恢复切换功能（StartupApproved 首字节奇偶位翻转，可逆无删改；HKCU Run/启动文件夹支持，HKLM 需管理员不动）+ UI 禁用/启用按钮；端到端验证 SA 值 03/02 翻转、UI 列表已禁用标注、测试残留全清 | 注册表读写实测 + 6 单测 |
 | R68 | 2026-10-26 | 自审无新增可修项（功能/健壮性/性能/文档四类均已覆盖），全部已绿，无改动 | 6 单测 + --clean-scan 13 类 + 应用运行中 |
 | R69 | 2026-10-26 | R67 收尾修复三连：①演示模式切换按钮 bug（data-dis 未渲染、`!b.dataset.dis === '1'` 恒 false）改为按渲染状态取反并翻转 DEMO_STARTUP；②clean.rs startup_toggle 未用变量 run_rel 删除；③main.rs startup_toggle 未用参数 state 删除（连带去掉恒等 map_err） | cargo build 0 警告 + 6 单测 + clippy 0 + node --check + --startup-scan/--selftest 正常 |
+| R69 | 2026-10-26 | 无改动轮：自审仍饱和（候选清单过一遍无新增），既有状态回归通过（6 单测 + 13 类扫描） | cargo test + --clean-scan |
