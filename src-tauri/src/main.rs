@@ -36,18 +36,18 @@ pub struct AppState {
 
 #[tauri::command]
 fn get_snapshot(state: tauri::State<AppState>) -> Option<Snapshot> {
-    state.latest.lock().unwrap().clone()
+    state.latest.lock().unwrap_or_else(|p| p.into_inner()).clone()
 }
 
 #[tauri::command]
 fn get_config(state: tauri::State<AppState>) -> config::Config {
-    state.config.lock().unwrap().clone()
+    state.config.lock().unwrap_or_else(|p| p.into_inner()).clone()
 }
 
 /// 返回 (id, label, 是否当前角色)
 #[tauri::command]
 fn list_characters(state: tauri::State<AppState>) -> Vec<(String, String, bool)> {
-    let cur = state.config.lock().unwrap().character.clone();
+    let cur = state.config.lock().unwrap_or_else(|p| p.into_inner()).character.clone();
     state
         .chars
         .lock()
@@ -59,7 +59,7 @@ fn list_characters(state: tauri::State<AppState>) -> Vec<(String, String, bool)>
 
 #[tauri::command]
 fn get_system_info(state: tauri::State<AppState>) -> Option<system_info::SystemInfo> {
-    state.sysinfo.lock().unwrap().clone()
+    state.sysinfo.lock().unwrap_or_else(|p| p.into_inner()).clone()
 }
 
 #[tauri::command]
@@ -89,7 +89,7 @@ async fn clean_execute(
             .map(|d| d.as_secs())
             .unwrap_or(0);
         {
-            let mut cfg = state.config.lock().unwrap();
+            let mut cfg = state.config.lock().unwrap_or_else(|p| p.into_inner());
             cfg.last_clean = Some(config::LastClean {
                 ts,
                 freed: r.freed_bytes,

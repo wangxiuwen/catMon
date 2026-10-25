@@ -78,3 +78,10 @@
 ## 当前阻塞（2026-10-25）
 
 - GitHub 开源发布等待用户完成设备码授权（https://github.com/login/device ，代码 E214-194A，走 7897 代理轮询中）；授权完成后执行：gh repo create wangxiuwen/catmon --public --source=. --push。本轮迭代暂缓一轮。
+
+## 2026-10-26 补录与新轮
+
+| 轮次 | 日期 | 内容 | 验证 |
+|---|---|---|---|
+| R42 | 2026-10-26 | flush_dns 命令改 async（ipconfig 进程拉起在主线程有 100-300ms 冻结，R27 同类） | cargo build + 6 单测 |
+| R43 | 2026-10-26 | 健壮性：main.rs 命令处理器 5 处 Mutex lock().unwrap() 补中毒自愈（R26 只覆盖了 tray.rs） | cargo build + 6 单测 |
