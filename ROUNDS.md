@@ -98,3 +98,4 @@ exit "$__zcode_status"
 | R49 | 2026-10-26 | 运维清理：移除 R30 测试残留在备份目录的 48 个 dummy-*.reg（真备份当时已被挤出上限，但内容均已消费/还原完毕，无损失） | 目录已清空 |
 | R50 | 2026-10-26 | 运维：刷新设备码（5503-F8CB，走代理轮询）、更新过期阻塞说明、ball.html 补 title | gh login 日志 + cargo build |
 | R51 | 2026-10-26 | UI：进程表 innerHTML 全量重建从每秒降为每 3 秒（切 tab 时强制刷），减少布局抖动 | node --check + cargo build |
+| R52 | 2026-10-26 | PDH 时钟启动失败后每分钟重试创建（服务未就绪不再永久回退基准值） | cargo build + 6 单测 + clippy 0 |

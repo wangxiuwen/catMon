@@ -99,6 +99,12 @@ impl Sampler {
             tx_total += data.total_transmitted();
         }
 
+        // PDH 启动失败（服务未就绪等）则每分钟重试创建
+        if self.clocks.is_none() && self.tick.is_multiple_of(60) {
+            let ncpu = self.sys.cpus().len();
+            self.clocks = crate::clocks::CoreClocks::new(ncpu);
+        }
+
         let disks: Vec<DiskInfo> = self
             .disks
             .list()
