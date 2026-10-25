@@ -285,6 +285,7 @@ async function init() {
     await T.event.listen('metrics', e => apply(e.payload));
     await T.event.listen('config', () => refreshHint().catch(console.error));
     await T.event.listen('sysinfo', e => renderInfo(e.payload));
+    try { T.app.getVersion().then(v => { $('ver').textContent = 'CatMon v' + v; }); } catch (e) {}
     await T.event.listen('clean-progress', e => {
       const p = e.payload || {};
       if (p.done) { $('btnClean').textContent = '清理所选'; return; }
