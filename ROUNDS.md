@@ -121,3 +121,4 @@ exit "$__zcode_status"
 | R74 | 2026-10-26 | UI invoke 异常兜底补齐：loadStartup/启动项删除与切换按钮/scanBig 全部 try/catch（后端拒绝不再卡「扫描中…」），与 R73 doClean 同类收口 | node --check + cargo build |
 | R75 | 2026-10-26 | 无改动轮：自审饱和，回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
 | R76 | 2026-10-26 | 无改动轮：回归通过（6 单测 + 13 类扫描 + clippy 0 + 应用运行中） | cargo test + --clean-scan + clippy |
+| R77 | 2026-10-26 | 无改动轮：自审饱和持续，回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
