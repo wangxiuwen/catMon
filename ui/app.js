@@ -12,6 +12,7 @@ function fmtRate(b) {
   return Math.round(b) + ' B/s';
 }
 function fmtSize(b) {
+  if (b >= 1099511627776) return (b / 1099511627776).toFixed(2) + ' TB';
   if (b >= 1073741824) return (b / 1073741824).toFixed(1) + ' GB';
   if (b >= 1048576) return (b / 1048576).toFixed(0) + ' MB';
   return (b / 1024).toFixed(0) + ' KB';
@@ -149,7 +150,7 @@ function apply(s) {
 }
 
 // ---- 清理页 ----
-function fmtB(b) { return b >= 1073741824 ? (b / 1073741824).toFixed(2) + ' GB' : b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : b >= 1024 ? (b / 1024).toFixed(0) + ' KB' : b + ' B'; }
+function fmtB(b) { return b >= 1099511627776 ? (b / 1099511627776).toFixed(2) + ' TB' : b >= 1073741824 ? (b / 1073741824).toFixed(2) + ' GB' : b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : b >= 1024 ? (b / 1024).toFixed(0) + ' KB' : b + ' B'; }
 
 function catRow(c) {
   // 用户清理过一次后按其勾选记忆恢复；首次进默认全选（有内容的项）

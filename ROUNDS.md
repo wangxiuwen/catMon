@@ -134,3 +134,4 @@ exit "$__zcode_status"
 | R84 | 2026-10-26 | 无改动轮：回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
 | R85 | 2026-10-26 | 无改动轮：自审饱和，回归通过（6 单测 + 14 项启动项 + 应用运行中） | cargo test + --startup-scan |
 | R86 | 2026-10-26 | 无改动轮：自审饱和，回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
+| R87 | 2026-10-26 | 容量格式化补 TB 档（fmtSize/fmtB，≥1TB 显示 x.xx TB），大容量盘不再显示 1268.2 GB | node --check + cargo build |
