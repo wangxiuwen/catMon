@@ -131,3 +131,4 @@ exit "$__zcode_status"
 | R81 | 2026-10-26 | 文档收口：ROUNDS 验证工具清单补齐 9 个 CDP 脚本（shot/uismoke/async/progress/copy 此前未登记） | grep 核对 |
 | R82 | 2026-10-26 | 无改动轮：回归通过（6 单测 + --info 6 组 + clippy 0 + 应用运行中） | cargo test + --info + clippy |
 | R83 | 2026-10-26 | NaN 防御：主面板/悬浮球的 CPU 显示加有限性守卫（后端浮点链路异常时不再显示 NaN%） | node --check ×2 + cargo build |
+| R84 | 2026-10-26 | 无改动轮：回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
