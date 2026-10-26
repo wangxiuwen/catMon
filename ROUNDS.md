@@ -129,3 +129,4 @@ exit "$__zcode_status"
 | R79 | 2026-10-26 | 无改动轮：自审饱和，回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
 | R80 | 2026-10-26 | README 截图替换为真实运行面板（CDP Page.captureScreenshot，tools/cdp-shot.mjs 可复用）；demo 旧图退役 | 截图 81KB 入库 docs/screenshot.png |
 | R81 | 2026-10-26 | 文档收口：ROUNDS 验证工具清单补齐 9 个 CDP 脚本（shot/uismoke/async/progress/copy 此前未登记） | grep 核对 |
+| R82 | 2026-10-26 | 无改动轮：回归通过（6 单测 + --info 6 组 + clippy 0 + 应用运行中） | cargo test + --info + clippy |
