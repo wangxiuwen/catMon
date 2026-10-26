@@ -938,9 +938,6 @@ mod imp {
             if let Ok(k) = root.open_subkey(r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run") {
                 for (name, v) in k.enum_values().flatten() {
                     let cmd = reg_str(&v).unwrap_or_else(|| format!("(二进制值 {} 字节)", v.bytes.len()));
-                    if name.starts_with("OneDrive-standalone-update") || name == "IcloudServices" {
-                        continue;
-                    }
                     let disabled = if admin {
                         false
                     } else {
