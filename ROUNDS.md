@@ -78,9 +78,9 @@
 - HKLM 系统级清理/启动项需要管理员，明确不处理
 - CPU-Z 的跑分/电压/完整 SPD 时序/制程 TDP 依赖内核驱动与内置数据库，不做
 
-## 当前阻塞（2026-10-25）
+## 当前阻塞
 
-- GitHub 开源发布等待用户凭据：设备码流程已两轮过期（用户卡在 GitHub 2FA 安全码），或提供 PAT 存 ~/.ghtoken。凭据就绪后执行：gh repo create wangxiuwen/catmon --public --source=. --push。
+（无——GitHub 开源发布已于 2026-10-26 完成：用户已建远程仓库 wangxiuwen/catMon，走本机 SSH over 443（ssh.github.com:443）推送成功，HTTPS 凭据路径全部不可用但 SSH 通道一直畅通。）
 
 ## 2026-10-26 补录与新轮
 
