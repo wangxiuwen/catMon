@@ -118,3 +118,4 @@ exit "$__zcode_status"
 | R72 | 2026-10-26 | ★修回归：清理结果报告被 rescan 开头的清空逻辑立即吃掉（用户看不到已释放统计）——报告改写在 rescan 完成之后 | node --check + cargo build |
 | R73 | 2026-10-26 | doClean 异常兜底：clean_execute 被拒（R16 互斥等）时按钮不再卡死「清理中…」，报告区显示失败原因 | node --check + cargo build |
 | R73 | 2026-10-26 | doClean 异常兜底：clean_execute 被拒（R16 互斥等）时按钮不再卡死「清理中…」，报告区显示失败原因 | node --check + cargo build |
+| R74 | 2026-10-26 | UI invoke 异常兜底补齐：loadStartup/启动项删除与切换按钮/scanBig 全部 try/catch（后端拒绝不再卡「扫描中…」），与 R73 doClean 同类收口 | node --check + cargo build |

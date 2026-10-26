@@ -181,7 +181,13 @@ const DEMO_STARTUP = [
 
 async function loadStartup() {
   $('startupBody').innerHTML = '<tr><td colspan="3" class="detail">扫描中…</td></tr>';
-  const list = T ? await T.core.invoke('startup_scan') : DEMO_STARTUP;
+  let list;
+  try {
+    list = T ? await T.core.invoke('startup_scan') : DEMO_STARTUP;
+  } catch (e) {
+    $('startupBody').innerHTML = '<tr><td colspan="3" class="detail">扫描失败，请重试</td></tr>';
+    return;
+  }
   $('startupBody').innerHTML = list.length ? list.map(s => `
     <tr><td>${esc(s.name)}${s.disabled ? ' <span class="detail">（已禁用）</span>' : ''}<div class="detail">${esc(s.source)}</div></td>
     <td class="detail" style="max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.cmd)}</td>
@@ -189,8 +195,13 @@ async function loadStartup() {
     : '<tr><td colspan="3" class="detail">没有启动项</td></tr>';
   $('startupBody').querySelectorAll('button[data-del]').forEach(b => b.onclick = async () => {
     b.disabled = true; b.textContent = '…';
-    const rep = T ? await T.core.invoke('startup_remove', { id: b.dataset.del }) : { removed_files: 1, backups: ['备份 x1'] };
-    $('cleanReport').textContent = `已删除启动项（备份 ${rep.backups.length} 份）` + (rep.errors.length ? ' · ' + rep.errors.join(';') : '');
+    try {
+      const rep = T ? await T.core.invoke('startup_remove', { id: b.dataset.del }) : { removed_files: 1, backups: ['备份 x1'] };
+      $('cleanReport').textContent = `已删除启动项（备份 ${rep.backups.length} 份）` + (rep.errors.length ? ' · ' + rep.errors.join(';') : '');
+    } catch (e) {
+      $('cleanReport').textContent = '删除失败: ' + e;
+      b.disabled = false;
+    }
     loadStartup();
   });
   $('startupBody').querySelectorAll('button[data-toggle]').forEach(b => b.onclick = async () => {
