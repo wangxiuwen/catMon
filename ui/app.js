@@ -100,7 +100,8 @@ function apply(s) {
   push(S.rx, s.rx || 0);
   push(S.tx, s.tx || 0);
 
-  $('cpuV').textContent = (s.cpu || 0).toFixed(0) + '%';
+  const cpuV = Number.isFinite(s.cpu) ? s.cpu : 0;
+  $('cpuV').textContent = cpuV.toFixed(0) + '%';
   // parked 核会报 0，最小值只看有读数的核
   const mz = (s.core_mhz || []).filter(v => v > 0);
   $('cpuDetail').textContent = mz.length

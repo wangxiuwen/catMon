@@ -6,7 +6,8 @@ const cpuV = document.getElementById('cpuV');
 const memV = document.getElementById('memV');
 
 function apply(s) {
-  const cpu = Math.max(0, Math.min(100, s.cpu || 0));
+  const raw = Number.isFinite(s.cpu) ? s.cpu : 0;
+  const cpu = Math.max(0, Math.min(100, raw));
   const mem = s.mem_total ? (s.mem_used / s.mem_total) * 100 : 0;
   ring.style.setProperty('--p', cpu.toFixed(0));
   cpuV.textContent = cpu.toFixed(0) + '%';
