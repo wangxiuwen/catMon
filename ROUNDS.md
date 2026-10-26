@@ -52,6 +52,9 @@
 
 - `tools/cdp-verify.mjs [port]`：主面板事件链路端到端验证（需以 WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9223" 启动后运行）
 - `tools/cdp-debug.mjs` / `tools/cdp-ball.mjs`：页面状态深查 / 悬浮球探针
+- `tools/cdp-uismoke.mjs [port]`：UI 端到端烟测（面板开合/页眉/系统配置/清理页/版本号 9 项）
+- `tools/cdp-shot.mjs [port] [outfile]`：真实面板截图（README 门面图即出自此）
+- `tools/cdp-async.mjs`：扫描期间 UI 冻结检测；`tools/cdp-progress.mjs`：清理进度事件探针；`tools/cdp-copy.mjs`：复制按钮探针
 
 ## 待办池（下轮从这里挑或自行审查发现）
 
@@ -125,3 +128,4 @@ exit "$__zcode_status"
 | R78 | 2026-10-26 | 移除启动项扫描的 OneDrive/IcloudServices 硬编码过滤——启动项管理应完整列出（R66 后判据一致原则） | --startup-scan 构建通过 |
 | R79 | 2026-10-26 | 无改动轮：自审饱和，回归通过（6 单测 + 13 类扫描 + 应用运行中） | cargo test + --clean-scan |
 | R80 | 2026-10-26 | README 截图替换为真实运行面板（CDP Page.captureScreenshot，tools/cdp-shot.mjs 可复用）；demo 旧图退役 | 截图 81KB 入库 docs/screenshot.png |
+| R81 | 2026-10-26 | 文档收口：ROUNDS 验证工具清单补齐 9 个 CDP 脚本（shot/uismoke/async/progress/copy 此前未登记） | grep 核对 |
